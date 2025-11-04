@@ -143,8 +143,6 @@ The system adopts a **hybrid cryptographic approach**, using **CRYSTALS-Kyber** 
   Secure data feeds from external systems (e.g., insurers, regulators).
 
 ### 11. IoT and Real-Time Health Data Integration
-- **Wearable Device Integration:**  
-  Continuous monitoring of health metrics through encrypted IoT streams.  
 - **Predictive Health Analytics:**  
   AI-driven early warnings based on federated models trained across institutions.  
 - **Digital Patient Twins:**  
@@ -178,29 +176,113 @@ The system adopts a **hybrid cryptographic approach**, using **CRYSTALS-Kyber** 
 
 **Key Components:**
 - **Permissioned DLT:** Hyperledger Fabric  
-- **Smart Contracts:** Chaincode (Go/Node.js)  
+- **Smart Contracts:** Chaincode (Node.js)  
 - **Quantum-Resistant Cryptography:** CRYSTALS-Kyber, CRYSTALS-Dilithium  
 - **Symmetric Encryption:** AES-256-GCM  
 - **Off-Chain Storage:** IPFS (InterPlanetary File System)  
 - **API Layer:** FHIR-based REST APIs for interoperability  
-- **Frontend Applications:** React (Web) and Flutter (Mobile)  
+- **Frontend Applications:** Nextjs (Web)  
 - **AI/Analytics Layer:** TensorFlow Federated, PySyft for federated learning  
 - **Monitoring:** Prometheus, Grafana, SIEM tools  
 - **Infrastructure:** Kubernetes, Docker, and secure cloud deployment
 
+
+
+
 ---
+
+## 🧩 Architectural Breakdown
+
+Below is a conceptual overview of the system’s layered architecture.
+
+---
+
+### **1. Frontend (User Interface Layer)**
+
+**Purpose:**  
+Acts as the primary interaction point for users such as patients, doctors, labs, and insurers.
+
+**Built Using:**  
+- Next.js  
+
+**Responsibilities:**  
+- Provides user dashboards (patient, doctor, insurer).  
+- Handles client-side encryption using **AES-256-GCM**.  
+- Interacts with the DLT and IPFS through APIs or SDKs.  
+- Manages cryptographic keys locally or in a secure wallet module.  
+- Displays medical records, consent statuses, and audit trails.
+
+**Functional Highlights:**  
+- User registration & post-quantum keypair generation (**CRYSTALS-Kyber**, **Dilithium**).  
+- Client-side encryption/decryption of health data.  
+- Secure DLT interfacing via a gateway layer.  
+- Fine-grained access control visualization (who can view or modify data).  
+
+---
+
+### **2. Middleware / API Gateway (Lightweight Backend Layer)**
+
+Although the DLT serves as the **main backend**, the **middleware** acts as a **bridge** between the frontend and blockchain network.
+
+**Implementation:**  
+- Node.js (Express)
+
+**Responsibilities:**  
+- Handle **Hyperledger Fabric SDK** calls for transactions.  
+- Interact with **smart contracts (chaincode)** for consent, access, and audit operations.  
+- Manage **off-chain storage** (e.g., encrypted data uploads to IPFS/Filecoin).  
+- Validate transactions before ledger commitment.  
+- Manage **authentication and session tokens** using post-quantum cryptographic proofs.  
+- Provide REST or GraphQL APIs to the frontend.
+
+> Essentially, this layer replaces the traditional centralized database with a **DLT interaction layer**.
+
+---
+
+### **3. DLT Network (Hyperledger Fabric Layer)**
+
+The **DLT network** acts as the **true backend-of-record** ensuring decentralization, integrity, and auditability.
+
+**Responsibilities:**  
+- Maintain an immutable ledger for all actions (record creation, access, consent updates).  
+- Host smart contracts (**chaincode**) defining access policies and consent logic.  
+- Provide **consensus**, **fault tolerance**, and **immutability**.  
+- Enforce **role-based access control** — only authorized nodes can transact.  
+- Store **references (hashes, metadata)** of encrypted medical records.
+
+**Deployment Note:**  
+Each participating institution — hospitals, labs, and insurers — hosts its own **Hyperledger Fabric peer node**, ensuring decentralization and trust distribution.
+
+---
+
+### **4. Off-Chain Storage Layer**
+
+Since storing large medical files directly on-chain is inefficient, the system leverages **off-chain decentralized storage**.
+
+**Technologies Used:**  
+- **IPFS**  for decentralized file storage.  
+
+**Responsibilities:**  
+- Store **encrypted medical files** (client-side encrypted before upload).  
+- Return **file hashes** or content identifiers (CIDs) for on-chain referencing.  
+- Manage **distributed data retrieval** for authorized users.  
+
+---
+
+
 
 ## Technology Stack Summary
 
 | Layer                      | Technology                             | Purpose                                     |
 |----------------------------|----------------------------------------|---------------------------------------------|
 | **DLT Core**               | Hyperledger Fabric                     | Permissioned ledger for secure transactions |
-| **Smart Contracts**        | Chaincode (Go/Node.js)                 | Access control, consent, and audit logic    |
+| **Smart Contracts**        | Chaincode (Node.js)                 | Access control, consent, and audit logic    |
 | **Cryptography**           | CRYSTALS-Kyber, Dilithium, AES-256-GCM | Post-quantum and hybrid encryption          |
-| **Storage**                | IPFS / Filecoin                        | Off-chain encrypted medical data            |
+| **Storage**                | IPFS                        | Off-chain encrypted medical data            |
 | **API Layer**              | FHIR, HL7                              | Interoperability with hospital systems      |
 | **AI/Analytics**           | Federated Learning, PySyft             | Privacy-preserving data analysis            |
-| **Frontend**               | React, Flutter                         | Web and mobile patient portals              |
+| **Frontend**               | Nextjs                         | Web patient portals using newer ui components like shadcn, blocks from smoothui & react Bits etc.              |
+| **Middleware / Gateway** | Node.js | API bridge for blockchain and IPFS interactions |
 | **Monitoring & Security**  | Prometheus, Grafana, SIEM              | Network and threat monitoring               |
 | **Infrastructure**         | Kubernetes, Docker                     | Containerized deployment and scaling        |
 
@@ -211,7 +293,6 @@ The system adopts a **hybrid cryptographic approach**, using **CRYSTALS-Kyber** 
 - **Channel-Based Isolation:** Each hospital or institution operates within its private channel.  
 - **Off-Chain Data Scaling:** IPFS ensures large data scalability without bloating the ledger.  
 - **Node Redundancy:** Ensures high availability and fault tolerance.  
-- **Edge Devices:** Support for IoT health sensors with lightweight PQC implementations.
 
 ---
 

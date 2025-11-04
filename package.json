@@ -1,0 +1,26 @@
+{
+  "name": "healthcare-dlt-core",
+  "version": "1.0.0",
+  "description": "Quantum-Resistant Healthcare Record Management System - DLT Core",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "middleware"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:middleware\"",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:middleware": "cd middleware && npm run dev",
+    "build": "npm run build:frontend && npm run build:middleware",
+    "build:frontend": "cd frontend && npm run build",
+    "build:middleware": "cd middleware && npm run build",
+    "install:all": "npm install && cd frontend && npm install && cd ../middleware && npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}
