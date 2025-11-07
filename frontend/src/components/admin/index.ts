@@ -1,0 +1,1 @@
+export { RegistrationApprovalDashboard } from './registration-approval-dashboard'

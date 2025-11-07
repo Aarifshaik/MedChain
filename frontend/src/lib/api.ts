@@ -2,11 +2,31 @@ import { ApiResponse } from '@/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
+interface AuthNonce {
+  nonce: string;
+  expiresAt: string;
+}
+
+interface AuthenticateRequest {
+  userId: string;
+  signature: string;
+  nonce: string;
+}
+
 class ApiClient {
   private baseURL: string;
 
   constructor(baseURL: string = API_BASE_URL) {
     this.baseURL = baseURL;
+  }
+
+  // Two-step authentication methods
+  async getNonce(userId: string): Promise<ApiResponse<AuthNonce>> {
+    return this.post<AuthNonce>('/auth/nonce', { userId });
+  }
+
+  async authenticate(data: AuthenticateRequest): Promise<ApiResponse<any>> {
+    return this.post('/auth/authenticate', data);
   }
 
   private async request<T>(
@@ -15,9 +35,12 @@ class ApiClient {
   ): Promise<ApiResponse<T>> {
     const url = `${this.baseURL}${endpoint}`;
     
+    // Don't set Content-Type for FormData, let browser handle it
+    const isFormData = options.body instanceof FormData;
+    
     const config: RequestInit = {
       headers: {
-        'Content-Type': 'application/json',
+        ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
         ...options.headers,
       },
       ...options,
@@ -56,14 +79,15 @@ class ApiClient {
     }
   }
 
-  async get<T>(endpoint: string): Promise<ApiResponse<T>> {
-    return this.request<T>(endpoint, { method: 'GET' });
+  async get<T>(endpoint: string, options?: RequestInit): Promise<ApiResponse<T>> {
+    return this.request<T>(endpoint, { method: 'GET', ...options });
   }
 
-  async post<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
+  async post<T>(endpoint: string, data?: any, options?: RequestInit): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
       method: 'POST',
-      body: data ? JSON.stringify(data) : undefined,
+      body: data instanceof FormData ? data : (data ? JSON.stringify(data) : undefined),
+      ...options,
     });
   }
 

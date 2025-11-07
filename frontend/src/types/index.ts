@@ -111,6 +111,33 @@ export interface AuditEntry {
   transactionId: string;
 }
 
+// Dashboard Types
+export interface DashboardStats {
+  totalRecords: number;
+  activeConsents: number;
+  recentAccess: number;
+  systemUsers: number;
+  recordsChange: string;
+  consentsChange: string;
+  accessChange: string;
+  usersChange: string;
+}
+
+export interface RecentActivity {
+  action: string;
+  user: string;
+  time: string;
+  type: 'upload' | 'consent' | 'access' | 'approval';
+}
+
+export interface SystemStatus {
+  quantumResistance: 'active' | 'inactive';
+  encryptionStatus: string;
+  keyAlgorithm: string;
+  signatureAlgorithm: string;
+  networkStatus: 'connected' | 'disconnected' | 'connecting';
+}
+
 // API Response Types
 export interface ApiResponse<T = any> {
   success: boolean;
